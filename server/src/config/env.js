@@ -16,6 +16,13 @@ export const env = {
   mongodbUri: process.env.MONGODB_URI,
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1d',
+  // 세 값이 모두 있으면 이미지를 Cloudinary에, 없으면 서버 로컬(uploads/)에 저장
+  cloudinary: {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    apiSecret: process.env.CLOUDINARY_API_SECRET,
+    folder: process.env.CLOUDINARY_FOLDER || 'momori',
+  },
   clientOrigins: (process.env.CLIENT_ORIGIN ?? 'http://localhost:5173')
     .split(',')
     .map((origin) => origin.trim())

@@ -8,9 +8,11 @@ import Table from "../../../components/admin/Table";
 import Toggle from "../../../components/admin/Toggle";
 import { useToast } from "../../../contexts/ToastContext";
 import { formatPrice } from "../../../utils/format";
+import { resizeImage } from "../../../utils/image";
 import "./ProductListPage.css";
 
 const LOW_STOCK = 5;
+const PAGE_SIZE = 2; // 한 페이지에 보여줄 상품 수
 
 function StockCell({ total }) {
   return (
@@ -56,7 +58,7 @@ function ProductListPage() {
   useEffect(() => {
     let ignore = false;
     adminApi
-      .getProducts(JSON.parse(queryKey))
+      .getProducts({ ...JSON.parse(queryKey), limit: PAGE_SIZE })
       .then((res) => !ignore && setResult(res))
       .catch((err) => !ignore && toast.error(err.message))
       .finally(() => !ignore && setLoadedKey(queryKey));
@@ -99,7 +101,7 @@ function ProductListPage() {
       render: (row) => {
         const src = row.thumbnail || row.images?.[0];
         return src ? (
-          <img src={src} alt="" className="product-thumb" loading="lazy" />
+          <img src={resizeImage(src, 96)} alt="" className="product-thumb" loading="lazy" />
         ) : (
           <span className="product-thumb product-thumb--empty">없음</span>
         );

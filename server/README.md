@@ -35,7 +35,7 @@ src/
 ├── controllers/       # 기능(요청 처리 로직): 라우트 파일과 1:1 대응
 ├── services/          # 여러 컨트롤러가 함께 쓰는 로직
 │   ├── order.service.js    # 재고 차감/복구, 주문 상태 변경 규칙
-│   └── storage.service.js  # 파일 저장 (지금은 로컬 uploads/, S3 등으로 바꿀 때 이 파일만 수정)
+│   └── storage.service.js  # 이미지 저장 (Cloudinary, 키가 없으면 로컬 uploads/)
 ├── utils/             # httpError(에러 생성), request(pick, 페이지네이션), authToken(JWT·쿠키)
 ├── models/            # Mongoose 스키마
 │   ├── User.js        # 회원 (비밀번호 해시, 배송지 목록)
@@ -188,9 +188,14 @@ router.use(requireAuth, requireAdmin);              // 관리자 전용 (role이
 | POST | /api/admin/products | 등록 |
 | PATCH | /api/admin/products/:id | 수정 (일부 필드만 가능, 예: `{ isActive: false }`) |
 | POST | /api/admin/uploads | 이미지 업로드 (multipart, field `images`) → 이미지 주소 배열 |
+| POST | /api/admin/uploads/url | 이미지 주소로 올리기 `{ url }` → Cloudinary가 가져와 저장한 주소 (Cloudinary 설정 필요) |
 
+- 상품 수정 시 빠진 이미지는 저장소(Cloudinary)에서도 삭제 (다른 상품이 쓰는 이미지는 유지).
 - 상품 **삭제 API는 없음**: 주문 기록 보호를 위해 판매중지(`isActive: false`)로 처리.
 - slug·SKU 중복은 409 + 어느 값이 겹치는지 안내. 대표 이미지(`thumbnail`)는 항상 `images` 중 하나로 자동 보정.
 - 업로드: jpg/png/webp, 1장당 5MB, 한 번에 최대 10장. 파일 내용(시그니처)까지 확인.
-  `server/uploads/products/`에 저장되고 `/uploads/...` 주소로 제공 (uploads 폴더는 git 제외).
+- 저장소: `.env`에 `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET`이 모두 있으면
+  **Cloudinary**(`momori/products/` 폴더)에 저장하고 `https://res.cloudinary.com/...` 주소를 반환.
+  비어 있으면 `server/uploads/products/`에 저장하고 `/uploads/...`로 제공 (키 없이 개발할 때용, git 제외).
+  서버 시작 로그에 현재 저장소가 표시됨.
 

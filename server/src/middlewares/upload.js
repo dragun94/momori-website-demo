@@ -1,9 +1,6 @@
 import multer from 'multer';
+import { ALLOWED_TYPES, MAX_FILE_SIZE, MAX_FILES } from '../config/upload.js';
 import { httpError } from '../utils/httpError.js';
-
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const MAX_FILES = 10;
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 const MULTER_MESSAGES = {
   LIMIT_FILE_SIZE: '이미지는 1장당 5MB 이하만 올릴 수 있어요',

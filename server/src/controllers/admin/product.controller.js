@@ -1,5 +1,6 @@
 import Category from '../../models/Category.js';
 import Product from '../../models/Product.js';
+import { deleteFile } from '../../services/storage.service.js';
 import { httpError } from '../../utils/httpError.js';
 import { escapeRegex, getPagination, paginationMeta, pick } from '../../utils/request.js';
 
@@ -101,7 +102,22 @@ export async function updateProduct(req, res) {
     assertSlugAvailable(data.slug, product._id),
     assertSkusAvailable(data.options, product._id),
   ]);
+  const previousImages = [...product.images];
   product.set(data);
   await product.save();
   res.json({ success: true, data: product });
+
+  // 저장이 끝난 뒤, 빠진 이미지를 저장소(Cloudinary)에서도 삭제 (실패해도 상품 수정에는 영향 없음)
+  if (data.images !== undefined) removeUnusedImages(previousImages.filter((url) => !product.images.includes(url)));
+}
+
+// 다른 상품에서도 쓰는 이미지는 남겨 둠
+async function removeUnusedImages(urls) {
+  for (const url of urls) {
+    try {
+      if (!(await Product.exists({ images: url }))) await deleteFile(url);
+    } catch (err) {
+      console.error('⚠️  이미지 삭제 실패:', url, err.message);
+    }
+  }
 }

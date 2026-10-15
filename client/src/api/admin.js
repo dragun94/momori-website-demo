@@ -62,3 +62,12 @@ export function uploadImages(files) {
   files.forEach((file) => form.append("images", file));
   return request(`${BASE_URL}/uploads`, { method: "POST", body: form });
 }
+
+/**
+ * 이미지 주소로 올리기 (Cloudinary가 그 주소에서 이미지를 가져와 저장)
+ * @param {string} url http(s) 이미지 주소
+ * @returns {Promise<string>} 우리 저장소에 저장된 이미지 주소
+ */
+export function uploadImageByUrl(url) {
+  return request(`${BASE_URL}/uploads/url`, { method: "POST", body: { url } });
+}

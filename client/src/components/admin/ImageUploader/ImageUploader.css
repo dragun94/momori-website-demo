@@ -116,3 +116,24 @@
   font-size: 12px;
   color: var(--a-text-muted);
 }
+
+/* ===== 이미지 주소로 추가 ===== */
+.a-uploader__url {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--a-border);
+}
+
+.a-uploader__url-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.a-uploader__url-row {
+  display: flex;
+  gap: 6px;
+  max-width: 560px;
+}

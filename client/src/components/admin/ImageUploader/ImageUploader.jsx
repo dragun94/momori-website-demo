@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
-import { uploadImages } from "../../../api/admin";
+import { uploadImageByUrl, uploadImages } from "../../../api/admin";
 import { useToast } from "../../../contexts/ToastContext";
+import { resizeImage } from "../../../utils/image";
 import "./ImageUploader.css";
 
 const MAX_IMAGES = 10;
@@ -18,6 +19,7 @@ function ImageUploader({ images, thumbnail, onChange }) {
   const inputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [urlText, setUrlText] = useState("");
   const remaining = MAX_IMAGES - images.length;
 
   // 서버에 보내기 전에 형식/용량/개수 먼저 확인 (서버에서도 한 번 더 검사)
@@ -37,6 +39,25 @@ function ImageUploader({ images, thumbnail, onChange }) {
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = ""; // 같은 파일 다시 선택 가능하게
+    }
+  };
+
+  // 이미지 주소로 추가: 서버(Cloudinary)가 이미지를 가져와 저장한 뒤 우리 저장소 주소를 돌려줌
+  const handleAddByUrl = async () => {
+    const url = urlText.trim();
+    if (!url || uploading) return;
+    if (!/^https?:\/\//i.test(url)) return toast.error("http:// 또는 https://로 시작하는 이미지 주소를 입력해 주세요");
+    if (remaining <= 0) return toast.error(`이미지는 최대 ${MAX_IMAGES}장까지 등록할 수 있어요`);
+
+    setUploading(true);
+    try {
+      const saved = await uploadImageByUrl(url);
+      onChange({ images: [...images, saved], thumbnail: thumbnail || saved });
+      setUrlText("");
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -64,7 +85,7 @@ function ImageUploader({ images, thumbnail, onChange }) {
       <ul className="a-uploader__grid">
         {images.map((url, index) => (
           <li key={url} className={`a-uploader__item ${url === thumbnail ? "is-thumbnail" : ""}`}>
-            <img src={url} alt={`상품 이미지 ${index + 1}`} className="a-uploader__img" />
+            <img src={resizeImage(url, 320)} alt={`상품 이미지 ${index + 1}`} className="a-uploader__img" />
             {url === thumbnail && <span className="a-uploader__badge">대표</span>}
             <div className="a-uploader__actions">
               <button type="button" onClick={() => move(index, -1)} disabled={index === 0} aria-label="앞으로 이동">
@@ -133,6 +154,37 @@ function ImageUploader({ images, thumbnail, onChange }) {
       <p className="a-uploader__hint">
         jpg, png, webp · 1장당 5MB 이하 · 최대 {MAX_IMAGES}장 · 끌어다 놓아도 돼요. 첫 이미지가 기본 대표 이미지예요.
       </p>
+
+      {/* 상품 폼(<form>) 안에 있으므로 form 대신 div + 엔터키 처리 (form 중첩 불가) */}
+      <div className="a-uploader__url">
+        <label htmlFor="image-url" className="a-uploader__url-label">
+          이미지 주소로 추가
+        </label>
+        <div className="a-uploader__url-row">
+          <input
+            id="image-url"
+            type="url"
+            className="a-input"
+            value={urlText}
+            onChange={(e) => setUrlText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key !== "Enter") return;
+              e.preventDefault(); // 상품 폼이 저장되지 않게
+              handleAddByUrl();
+            }}
+            placeholder="https://example.com/bib.jpg"
+            disabled={uploading || remaining <= 0}
+          />
+          <button
+            type="button"
+            className="a-btn"
+            onClick={handleAddByUrl}
+            disabled={uploading || remaining <= 0 || !urlText.trim()}
+          >
+            {uploading ? "가져오는 중…" : "추가"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

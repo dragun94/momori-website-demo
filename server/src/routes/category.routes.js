@@ -1,15 +1,10 @@
 import { Router } from 'express';
 import * as categoryController from '../controllers/category.controller.js';
 
+// 쇼핑몰용 조회 전용 (등록/수정/삭제는 /api/admin/categories)
 const router = Router();
 
-router.route('/')
-  .get(categoryController.getCategories)
-  .post(categoryController.createCategory);
-
-router.route('/:id')
-  .get(categoryController.getCategory)
-  .patch(categoryController.updateCategory)
-  .delete(categoryController.deleteCategory);
+router.get('/', categoryController.getCategories);
+router.get('/:id', categoryController.getCategory);
 
 export default router;

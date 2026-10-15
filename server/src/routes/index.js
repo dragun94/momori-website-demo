@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import mongoose from 'mongoose';
 import authRoutes from './auth.routes.js';
+import adminRoutes from './admin/index.js';
 import userRoutes from './user.routes.js';
 import categoryRoutes from './category.routes.js';
 import productRoutes from './product.routes.js';
@@ -22,6 +23,7 @@ router.get('/health', (req, res) => {
 });
 
 router.use('/auth', authRoutes);
+router.use('/admin', adminRoutes);
 router.use('/users', userRoutes);
 router.use('/categories', categoryRoutes);
 router.use('/products', productRoutes);

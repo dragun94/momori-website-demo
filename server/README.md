@@ -9,6 +9,9 @@ npm install
 cp .env.example .env   # 값 수정 (JWT_SECRET은 반드시 무작위 문자열로)
 npm run dev            # 개발 (nodemon 자동 재시작)
 npm start              # 운영
+
+npm run seed                         # 테스트 데이터: 카테고리·상품만 지우고 다시 생성 (회원·주문 유지)
+npm run make-admin -- 이메일          # 해당 회원을 관리자로 지정
 ```
 
 ## 폴더 구조
@@ -20,6 +23,7 @@ src/
 ├── config/            # 환경변수(env.js), DB 연결(db.js)
 ├── routes/            # 주소(URL) → 컨트롤러 연결만 담당 (로직 없음)
 │   ├── index.js       # /api 아래에 각 라우트 등록
+│   ├── admin/              # /api/admin/* 관리자 전용 (requireAuth + requireAdmin)
 │   ├── auth.routes.js      # 회원가입, 로그인/로그아웃, 내 정보
 │   ├── user.routes.js
 │   ├── address.routes.js   # /users/:userId/addresses
@@ -30,7 +34,8 @@ src/
 │   └── payment.routes.js
 ├── controllers/       # 기능(요청 처리 로직): 라우트 파일과 1:1 대응
 ├── services/          # 여러 컨트롤러가 함께 쓰는 로직
-│   └── order.service.js    # 재고 차감/복구, 주문 상태 변경 규칙
+│   ├── order.service.js    # 재고 차감/복구, 주문 상태 변경 규칙
+│   └── storage.service.js  # 파일 저장 (지금은 로컬 uploads/, S3 등으로 바꿀 때 이 파일만 수정)
 ├── utils/             # httpError(에러 생성), request(pick, 페이지네이션), authToken(JWT·쿠키)
 ├── models/            # Mongoose 스키마
 │   ├── User.js        # 회원 (비밀번호 해시, 배송지 목록)
@@ -121,24 +126,16 @@ router.use(requireAuth, requireAdmin);              // 관리자 전용 (role이
 
 기본 배송지는 항상 1개로 유지 (첫 주소는 자동 기본, 기본 주소 삭제 시 첫 번째가 기본).
 
-### 카테고리 `/api/categories`
+### 카테고리·상품 (쇼핑몰용, 조회 전용)
 | Method | URL | 설명 |
 |---|---|---|
-| GET | / | 목록 (order 순). `?active=true` 노출 중만 |
-| POST | / | 생성 `{ name, slug, order?, isActive? }` |
-| GET | /:id | 조회 |
-| PATCH | /:id | 수정 |
-| DELETE | /:id | 삭제 (상품이 있으면 409) |
+| GET | /api/categories | 노출 중인 카테고리 (order 순) |
+| GET | /api/categories/:id | 조회 |
+| GET | /api/products | 판매 중인 상품. `?category=<id>&page=1&limit=20` |
+| GET | /api/products/slug/:slug | slug로 조회 (상품 상세용) |
+| GET | /api/products/:id | 조회 |
 
-### 상품 `/api/products`
-| Method | URL | 설명 |
-|---|---|---|
-| GET | / | 목록. `?category=<id>&active=true&page=1&limit=20` |
-| POST | / | 생성 `{ name, slug, price, salePrice?, category, options[], images?, thumbnail?, description? }` |
-| GET | /slug/:slug | slug로 조회 (상품 상세 페이지용) |
-| GET | /:id | 조회 |
-| PATCH | /:id | 수정 |
-| DELETE | /:id | 삭제 (판매 중지만 하려면 `isActive: false`) |
+숨김 카테고리·판매중지 상품은 404. 등록/수정은 아래 관리자 API로만 가능.
 
 ### 장바구니 `/api/carts/:userId`
 | Method | URL | 설명 |
@@ -177,3 +174,23 @@ router.use(requireAuth, requireAdmin);              // 관리자 전용 (role이
 | DELETE | /:id | 삭제 |
 
 결제 `status: 'done'` → paidAt 기록 + 주문 `paid`, `'cancelled'` → cancelledAt 기록 + 주문 취소(재고 복구).
+
+### 관리자 `/api/admin` (관리자만 — 비로그인 401, 일반 회원 403)
+| Method | URL | 설명 |
+|---|---|---|
+| GET | /api/admin/categories | 전체 카테고리 + 상품 수(`productCount`) |
+| POST | /api/admin/categories | 추가 `{ name, slug, isActive? }` (맨 뒤 순서로) |
+| PATCH | /api/admin/categories/reorder | 순서 변경 `{ ids: [...] }` (배열 순서대로) |
+| PATCH | /api/admin/categories/:id | 수정 |
+| DELETE | /api/admin/categories/:id | 삭제 (상품이 있으면 409) |
+| GET | /api/admin/products | 목록. `?q=상품명&category=<id>&status=active|inactive&page=1` (20개씩, `totalStock` 포함) |
+| GET | /api/admin/products/:id | 조회 (수정 폼용) |
+| POST | /api/admin/products | 등록 |
+| PATCH | /api/admin/products/:id | 수정 (일부 필드만 가능, 예: `{ isActive: false }`) |
+| POST | /api/admin/uploads | 이미지 업로드 (multipart, field `images`) → 이미지 주소 배열 |
+
+- 상품 **삭제 API는 없음**: 주문 기록 보호를 위해 판매중지(`isActive: false`)로 처리.
+- slug·SKU 중복은 409 + 어느 값이 겹치는지 안내. 대표 이미지(`thumbnail`)는 항상 `images` 중 하나로 자동 보정.
+- 업로드: jpg/png/webp, 1장당 5MB, 한 번에 최대 10장. 파일 내용(시그니처)까지 확인.
+  `server/uploads/products/`에 저장되고 `/uploads/...` 주소로 제공 (uploads 폴더는 git 제외).
+

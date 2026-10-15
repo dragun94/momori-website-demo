@@ -14,6 +14,11 @@ export function getPagination(query) {
   return { page, limit, skip: (page - 1) * limit };
 }
 
+// 검색어를 정규식에 안전하게 넣기 위해 특수문자 이스케이프
+export function escapeRegex(text) {
+  return String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export function paginationMeta({ page, limit }, total) {
   return { page, limit, total, totalPages: Math.ceil(total / limit) };
 }

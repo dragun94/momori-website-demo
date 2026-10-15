@@ -1,0 +1,140 @@
+.product-form-page {
+  max-width: 920px;
+}
+
+.product-form__back {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--a-text-sub);
+  text-decoration: none;
+}
+
+.product-form__back:hover {
+  color: var(--a-text);
+}
+
+.product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.product-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px;
+}
+
+.product-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.product-section__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.product-section__title .a-muted {
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* ===== 옵션 행 ===== */
+.option-head,
+.option-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.6fr) 96px 120px 56px;
+  gap: 8px;
+}
+
+.option-head {
+  margin-bottom: -8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--a-text-sub);
+}
+
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.option-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.option-sku {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+.option-remove {
+  height: 38px;
+  color: var(--a-danger);
+}
+
+/* ===== 하단 저장 버튼 (스크롤해도 아래에 고정) ===== */
+.product-form__actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 0 -4px;
+  padding: 12px 4px;
+  border-top: 1px solid var(--a-border);
+  background: var(--a-bg);
+}
+
+.product-form__actions .a-muted {
+  margin-right: auto;
+  font-size: 13px;
+}
+
+@media (max-width: 720px) {
+  .product-section {
+    padding: 16px;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .option-head {
+    display: none;
+  }
+
+  /* 좁은 화면: 옵션명/SKU 한 줄, 재고/추가금액/삭제 한 줄 */
+  .option-row {
+    grid-template-columns: 1fr 1fr 56px;
+    padding: 12px;
+    border: 1px solid var(--a-border);
+    border-radius: var(--a-radius);
+  }
+
+  .option-row .option-cell:nth-child(1),
+  .option-row .option-cell:nth-child(2) {
+    grid-column: span 3;
+  }
+}

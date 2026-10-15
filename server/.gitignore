@@ -4,3 +4,6 @@ node_modules/
 !.env.example
 *.log
 .DS_Store
+
+# 업로드한 이미지 (로컬 저장소)
+uploads/

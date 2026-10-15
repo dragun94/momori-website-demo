@@ -35,7 +35,7 @@ function Header() {
               <>
                 {user.role === "admin" && (
                   <Link to="/admin" className="header__link header__link--admin">
-                    어드민
+                    관리자
                   </Link>
                 )}
                 <span className="header__user">

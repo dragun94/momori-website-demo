@@ -1,0 +1,195 @@
+/* ===== 관리자 화면 공통 스타일 =====
+   쇼핑몰보다 단순한 업무용 톤. 브랜드 컬러(--color-point-strong)는 포인트로만 사용.
+   관리자 화면에서만 불러오므로(.admin 아래) 쇼핑몰 스타일에 영향 없음 */
+.admin {
+  --a-bg: #f5f6f8;
+  --a-surface: #ffffff;
+  --a-surface-sub: #f9fafb;
+  --a-border: #e4e6ea;
+  --a-border-strong: #cfd3da;
+  --a-text: #1f2328;
+  --a-text-sub: #5f6670;
+  --a-text-muted: #969ca6;
+  --a-point: var(--color-point-strong);
+  --a-point-soft: var(--color-point-soft);
+  --a-danger: #d14343;
+  --a-danger-soft: #fdecec;
+  --a-warning: #a86b00;
+  --a-warning-soft: #fff4dc;
+  --a-success: #2c7a4b;
+  --a-success-soft: #e6f4ec;
+  --a-radius: 8px;
+  --a-topbar-height: 56px;
+  --a-sidebar-width: 220px;
+
+  min-height: 100vh;
+  background: var(--a-bg);
+  color: var(--a-text);
+  font-size: 14px;
+}
+
+/* ===== 버튼 ===== */
+.a-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--a-border-strong);
+  border-radius: var(--a-radius);
+  background: var(--a-surface);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--a-text);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.a-btn:hover:not(:disabled) {
+  background: var(--a-surface-sub);
+}
+
+.a-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.a-btn:focus-visible,
+.a-input:focus-visible,
+.a-select:focus-visible {
+  outline: 2px solid var(--a-point);
+  outline-offset: 1px;
+}
+
+.a-btn--primary {
+  border-color: var(--a-point);
+  background: var(--a-point);
+  color: #fff;
+}
+
+.a-btn--primary:hover:not(:disabled) {
+  background: #db8c70;
+}
+
+.a-btn--danger {
+  border-color: var(--a-danger);
+  background: var(--a-danger);
+  color: #fff;
+}
+
+.a-btn--danger:hover:not(:disabled) {
+  background: #b93636;
+}
+
+.a-btn--ghost {
+  border-color: transparent;
+  background: transparent;
+}
+
+.a-btn--sm {
+  height: 30px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+.a-btn--icon {
+  width: 30px;
+  padding: 0;
+}
+
+/* ===== 입력 ===== */
+.a-input,
+.a-select,
+.a-textarea {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--a-border-strong);
+  border-radius: var(--a-radius);
+  background: var(--a-surface);
+  font-size: 14px;
+  color: var(--a-text);
+}
+
+.a-textarea {
+  height: auto;
+  min-height: 120px;
+  padding: 10px 12px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.a-input:focus,
+.a-select:focus,
+.a-textarea:focus {
+  border-color: var(--a-point);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--a-point-soft);
+}
+
+.a-input[aria-invalid='true'],
+.a-select[aria-invalid='true'] {
+  border-color: var(--a-danger);
+}
+
+.a-input::placeholder,
+.a-textarea::placeholder {
+  color: var(--a-text-muted);
+}
+
+/* ===== 페이지 공통 ===== */
+.a-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.a-page__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.a-page__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.a-page__desc {
+  margin: 4px 0 0;
+  color: var(--a-text-sub);
+}
+
+.a-card {
+  background: var(--a-surface);
+  border: 1px solid var(--a-border);
+  border-radius: var(--a-radius);
+}
+
+.a-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px;
+  border-bottom: 1px solid var(--a-border);
+}
+
+.a-toolbar__spacer {
+  flex: 1;
+}
+
+.a-muted {
+  color: var(--a-text-muted);
+}
+
+.a-sub {
+  font-size: 12px;
+  color: var(--a-text-muted);
+}

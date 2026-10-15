@@ -1,0 +1,32 @@
+.a-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.a-field__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--a-text);
+}
+
+.a-field__required {
+  margin-left: 2px;
+  color: var(--a-point);
+}
+
+.a-field__hint,
+.a-field__error {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.a-field__hint {
+  color: var(--a-text-muted);
+}
+
+.a-field__error {
+  color: var(--a-danger);
+}

@@ -1,17 +1,11 @@
 import { Router } from 'express';
 import * as productController from '../controllers/product.controller.js';
 
+// 쇼핑몰용 조회 전용 (등록/수정/판매중지는 /api/admin/products)
 const router = Router();
 
-router.route('/')
-  .get(productController.getProducts)
-  .post(productController.createProduct);
-
+router.get('/', productController.getProducts);
 router.get('/slug/:slug', productController.getProductBySlug);
-
-router.route('/:id')
-  .get(productController.getProduct)
-  .patch(productController.updateProduct)
-  .delete(productController.deleteProduct);
+router.get('/:id', productController.getProduct);
 
 export default router;

@@ -1,0 +1,24 @@
+.category-order,
+.category-actions {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.category-slug {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--a-surface-sub);
+  font-size: 13px;
+  color: var(--a-text-sub);
+}
+
+.category-delete {
+  color: var(--a-danger);
+}
+
+.category-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--a-text);
+}

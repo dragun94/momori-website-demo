@@ -1,0 +1,31 @@
+.a-search {
+  position: relative;
+  display: flex;
+  gap: 6px;
+  flex: 1 1 260px;
+  max-width: 360px;
+}
+
+.a-search__input {
+  padding-right: 32px;
+}
+
+.a-search__clear {
+  position: absolute;
+  top: 50%;
+  right: 66px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--a-text-muted);
+  cursor: pointer;
+}
+
+.a-search__clear:hover {
+  color: var(--a-text);
+}

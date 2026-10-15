@@ -93,6 +93,7 @@ function SignupPage() {
         email: form.email.trim(),
         password: form.password,
         name: form.name.trim(),
+        termsAgreed: requiredAgreed,
         marketingAgreed: agreements.marketing,
       });
       setDone(true);

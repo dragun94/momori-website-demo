@@ -29,6 +29,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, '비밀번호는 필수입니다'],
       minlength: [8, '비밀번호는 8자 이상이어야 합니다'],
+      // 검증은 해시 전(pre save보다 먼저) 평문 기준으로 실행됨
+      match: [/^(?=.*[A-Za-z])(?=.*\d)/, '비밀번호는 영문과 숫자를 함께 사용해야 합니다'],
       select: false,
     },
     name: { type: String, required: [true, '이름은 필수입니다'], trim: true },
@@ -39,6 +41,11 @@ const userSchema = new mongoose.Schema(
       default: 'user',
     },
     addresses: [addressSchema],
+    // 필수 약관(이용약관, 개인정보, 만 14세 이상) 동의 시각
+    termsAgreedAt: { type: Date },
+    // 마케팅 수신 동의는 동의 여부와 시각을 함께 기록
+    marketingAgreed: { type: Boolean, default: false },
+    marketingAgreedAt: { type: Date },
   },
   {
     timestamps: true,

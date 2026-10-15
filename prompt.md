@@ -1,66 +1,78 @@
-server 폴더의 Mongoose 모델을 쇼핑몰용으로 만들어줘.
+모모리 쇼핑몰의 로그인 기능을 서버와 클라이언트 모두 만들어줘.
 
 ## 배경
 
-- 육아용품 단일 브랜드 테스트 쇼핑몰 "모모리" (첫 상품: 턱받이)
-- 회원 주문만 가능 (비회원 주문 없음)
-- 나중에 토스페이먼츠 같은 PG 결제를 붙일 예정
-- 테스트용이라 과하게 복잡할 필요는 없지만, 실제 쇼핑몰에 필요한 필수 요소는 모두 갖출 것
+- 육아용품 단일 브랜드 테스트 쇼핑몰 "모모리", 회원 주문만 가능
+- 회원가입(/signup)과 POST /api/auth/signup은 이미 구현되어 있음
+- client는 Vite 프록시로 /api 요청을 server로 전달 중
+- 테스트용이지만 실제 쇼핑몰 수준의 로그인 필수 요소는 모두 갖출 것
 
 ## 작업 전에
 
-1. server/src 구조와 기존 models/User 모델, package.json을 먼저 읽고
-   모듈 방식(ESM/CommonJS), 코드 스타일, 네이밍 규칙을 그대로 따라줘.
-2. 모든 스키마에 timestamps: true 적용.
+1. 기존 회원가입 관련 파일(routes/auth, authController, User 모델,
+   client의 회원가입 페이지·공통 컴포넌트·api/auth.js)을 먼저 읽고
+   구조와 스타일을 그대로 따라줘.
+2. 필요한 패키지(jsonwebtoken, cookie-parser 등)가 없으면 설치해줘.
 
-## 만들 모델 (server/src/models/)
+## 서버
 
-1. User (기존 모델 확장)
-   - email(unique, 소문자), password(bcrypt 해시, select: false), name, phone
-   - role: 'user' | 'admin' (기본 'user')
-   - addresses: [{ recipient, phone, zipCode, address1, address2, isDefault }]
-   - 저장 전 비밀번호 해시, 비밀번호 비교 메서드 추가
+1. 인증 방식: JWT를 httpOnly 쿠키에 저장
+   - 쿠키 옵션: httpOnly, sameSite 'lax', 운영 환경(NODE_ENV=production)에서만 secure
+   - JWT_SECRET, JWT_EXPIRES_IN은 .env와 .env.example에 추가, config/env.js에서 불러오기
+   - 기본 유효기간 1일, "로그인 상태 유지" 체크 시 30일
 
-2. Category
-   - name, slug(unique), order(정렬순서), isActive
+2. API
+   - POST /api/auth/login: { email, password, rememberMe }
+     · 이메일 없음/비밀번호 틀림 모두 401 + "이메일 또는 비밀번호가 맞지 않아요" (구분하지 않기)
+     · 성공 시 쿠키 설정 + 비밀번호 제외한 회원 정보 반환
+   - GET /api/auth/me: 쿠키의 토큰으로 현재 회원 정보 반환, 없거나 만료면 401
+   - POST /api/auth/logout: 쿠키 삭제
 
-3. Product
-   - name, slug(unique), description, price, salePrice(선택)
-   - images: [String], thumbnail
-   - category(Category ref)
-   - options: [{ name, sku, stock, extraPrice(기본 0) }] ← 재고는 옵션 단위
-   - isActive(판매 여부)
+3. 미들웨어 (middlewares/)
+   - requireAuth: 토큰 검증 후 req.user에 회원 정보 저장, 실패 시 401
+   - requireAdmin: requireAuth 이후 role이 'admin'인지 확인, 아니면 403
+   - 회원가입 성공 시에도 바로 로그인되도록 쿠키를 발급할지는 하지 말고, 지금처럼 로그인 페이지로 이동 유지
 
-4. Cart
-   - user(User ref, unique — 회원당 1개)
-   - items: [{ product(ref), optionSku, quantity(최소 1) }]
+4. 로그인 시도 제한: express-rate-limit로 /api/auth/login에
+   15분에 10회 제한, 초과 시 429 + "잠시 후 다시 시도해 주세요"
 
-5. Order
-   - orderNumber(unique, 예: 20261015-XXXXXX 형태 자동 생성)
-   - user(User ref, required)
-   - items: [{ product(ref), productName, optionName, optionSku, price, quantity, thumbnail }]
-     ← 주문 당시 정보를 스냅샷으로 저장 (상품이 수정/삭제돼도 주문 내역 유지)
-   - shipping: { recipient, phone, zipCode, address1, address2, memo }
-   - amounts: { itemsTotal, shippingFee, discount, total }
-   - status: 'pending' | 'paid' | 'preparing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded'
-     (기본 'pending')
-   - 상태 변경 이력용 statusHistory: [{ status, changedAt }]
+## 클라이언트
 
-6. Payment
-   - order(Order ref), user(User ref)
-   - provider(예: 'toss'), paymentKey, method, amount
-   - status: 'ready' | 'done' | 'cancelled' | 'failed'
-   - paidAt, cancelledAt, failReason
-   - rawResponse(PG 응답 원본, Mixed 타입)
+1. 로그인 페이지 (/login, 지금은 빈 화면만 있음)
+   - 회원가입 페이지와 같은 디자인 톤·레이아웃·공통 컴포넌트 재사용
+   - 상단 "모모리" 로고 + 짧은 환영 문구 (예: "다시 만나서 반가워요")
+   - 이메일, 비밀번호(보기/숨기기), 로그인 상태 유지 체크박스
+   - 로그인 버튼 로딩 상태, 중복 클릭 방지, 엔터키로 제출
+   - 서버 오류 메시지를 입력칸 아래 또는 버튼 위에 표시
+   - 하단 "아직 회원이 아니신가요? 회원가입" 링크
+   - "비밀번호 찾기" 링크는 자리만 만들고 클릭 시 "준비 중이에요" 안내
 
-## 요구사항
+2. 전역 로그인 상태 (React Context)
+   - AuthContext: user, isLoading, login(), logout(), refresh() 제공
+   - 앱 시작 시 GET /api/auth/me 호출해서 새로고침해도 로그인 유지
+   - 확인 중(isLoading)에는 화면이 깜빡이지 않게 처리
 
-- 필요한 필드에 required, min, enum 등 검증 추가
-- 자주 조회하는 필드(user, orderNumber, slug, category)에 인덱스 설정
-- bcrypt 등 필요한 패키지가 없으면 설치 명령어 알려줘
-- 이번 작업은 모델 파일만. 라우트/컨트롤러는 아직 만들지 마.
+3. 헤더 (간단하게)
+   - 모든 페이지 상단에 "모모리" 로고(메인으로 이동)
+   - 로그인 전: 로그인 / 회원가입
+   - 로그인 후: "OO님" + 마이페이지 + 로그아웃
+   - 모바일 화면 기준으로 깔끔하게
+
+4. 보호된 페이지
+   - ProtectedRoute 컴포넌트: 비로그인 시 /login으로 이동
+   - 로그인 후 원래 가려던 페이지로 돌아가기 (없으면 메인)
+   - 테스트용으로 /mypage를 만들어 보호 적용 (이름, 이메일, 휴대폰만 표시)
+   - 이미 로그인한 상태로 /login, /signup 접근 시 메인으로 이동
+
+5. 로그아웃: 서버 호출 → 상태 초기화 → 메인으로 이동
+
+## 범위
+
+- 소셜 로그인, 비밀번호 찾기 실제 기능은 아직 만들지 마.
+- 메인 페이지가 없으면 "모모리" 로고와 간단한 문구만 있는 임시 메인(/)을 만들어줘.
 
 ## 완료 후
 
-- 만든 파일 목록과 각 모델 간 관계(ref)를 짧게 정리해줘
-- README의 폴더 구조/모델 설명도 업데이트해줘
+- 만든/수정한 파일 목록
+- 테스트 방법 순서대로 (회원가입 → 로그인 → 새로고침 → 마이페이지 → 로그아웃 → 마이페이지 접근 시 로그인으로 이동되는지)
+- 새로 추가한 .env 항목

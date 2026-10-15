@@ -37,7 +37,7 @@ function defaultMessage(status) {
 
 /**
  * 회원가입
- * @param {{ email: string, password: string, name: string, marketingAgreed: boolean }} payload
+ * @param {{ email: string, password: string, name: string, termsAgreed: boolean, marketingAgreed: boolean }} payload
  */
 export function signup(payload) {
   return request("/signup", { method: "POST", body: payload });

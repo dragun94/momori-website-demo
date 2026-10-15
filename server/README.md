@@ -20,6 +20,7 @@ src/
 ├── config/            # 환경변수(env.js), DB 연결(db.js)
 ├── routes/            # 주소(URL) → 컨트롤러 연결만 담당 (로직 없음)
 │   ├── index.js       # /api 아래에 각 라우트 등록
+│   ├── auth.routes.js      # 회원가입 (로그인 예정)
 │   ├── user.routes.js
 │   ├── address.routes.js   # /users/:userId/addresses
 │   ├── category.routes.js
@@ -47,7 +48,7 @@ src/
 
 | 모델 | 주요 필드 | 참조(ref) |
 |---|---|---|
-| User | email(unique), password(해시, `select: false`), name, phone, role(`user`/`admin`), addresses[] | - |
+| User | email(unique), password(해시, `select: false`), name, phone, role(`user`/`admin`), addresses[], termsAgreedAt, marketingAgreed, marketingAgreedAt | - |
 | Category | name, slug(unique), order, isActive | - |
 | Product | name, slug(unique), description, price, salePrice, images[], thumbnail, options[{ name, sku, stock, extraPrice }], isActive | category → Category |
 | Cart | items[{ product, optionSku, quantity }] | user → User (unique), items.product → Product |
@@ -73,6 +74,15 @@ User ─┬─< Cart(1:1) ──> Product ──> Category
 모든 응답 형식: `{ success, data }` (목록 페이지네이션 시 `pagination` 추가) / 에러: `{ success: false, message }`
 
 > ⚠️ 아직 인증(로그인)이 없어서 사용자 ID를 URL/body로 직접 넘깁니다. 인증 도입 후 토큰에서 꺼내도록 바꿀 예정.
+
+### 인증 `/api/auth`
+| Method | URL | 설명 |
+|---|---|---|
+| POST | /api/auth/signup | 회원가입 `{ email, password, name, phone?, termsAgreed, marketingAgreed? }` |
+
+- `termsAgreed: true`가 아니면 400 (필수 약관: 이용약관·개인정보·만 14세 이상). 동의 시각은 `termsAgreedAt`에 저장.
+- 마케팅 동의 시 `marketingAgreed`, `marketingAgreedAt` 저장. 이미 가입된 이메일은 409.
+- 비밀번호: 8자 이상, 영문+숫자 포함 (저장 시 bcrypt 해시).
 
 ### 회원 `/api/users`
 | Method | URL | 설명 |

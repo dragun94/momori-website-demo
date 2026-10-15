@@ -1,0 +1,53 @@
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-height: 44px;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox--strong {
+  min-height: 48px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* 실제 input은 숨기고 접근성은 유지 */
+.checkbox__input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.checkbox__box {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-surface);
+  color: transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.checkbox--strong .checkbox__box {
+  width: 24px;
+  height: 24px;
+}
+
+.checkbox__input:checked + .checkbox__box {
+  border-color: var(--color-point-strong);
+  background: var(--color-point-strong);
+  color: #fff;
+}
+
+.checkbox__input:focus-visible + .checkbox__box {
+  box-shadow: 0 0 0 4px var(--color-point-soft);
+}

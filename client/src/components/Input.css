@@ -1,0 +1,82 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field__label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.field__control {
+  position: relative;
+}
+
+.field__input {
+  width: 100%;
+  height: var(--control-height);
+  padding: 0 16px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: 16px; /* 16px 미만이면 iOS에서 자동 확대됨 */
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.field__input::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+.field__input:focus {
+  border-color: var(--color-point);
+  box-shadow: 0 0 0 4px var(--color-point-soft);
+}
+
+.field__control:has(.field__toggle) .field__input {
+  padding-right: 72px;
+}
+
+.field__toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-sub);
+  cursor: pointer;
+}
+
+.field__toggle:hover {
+  background: var(--color-surface-soft);
+}
+
+.field__message {
+  margin: 0;
+  padding-left: 4px;
+  font-size: 13px;
+  color: var(--color-text-sub);
+}
+
+.field--error .field__input {
+  border-color: var(--color-error);
+}
+
+.field--error .field__input:focus {
+  box-shadow: 0 0 0 4px #fbe5e1;
+}
+
+.field--error .field__message {
+  color: var(--color-error);
+}
+
+.field--success .field__message {
+  color: var(--color-success);
+}

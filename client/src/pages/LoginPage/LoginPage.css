@@ -1,0 +1,8 @@
+/* 로그인 상태 유지 | 비밀번호 찾기 */
+.login-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: -6px;
+}

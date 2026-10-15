@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import Button from "./Button";
+import Button from "../Button";
 import "./Modal.css";
 
 /** 약관 보기 등에 쓰는 간단한 모달 (모바일에서는 아래에서 올라오는 시트 형태) */

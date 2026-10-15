@@ -1,0 +1,11 @@
+.home {
+  text-align: center;
+  padding-top: 15vh;
+}
+
+.home__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 40px;
+}

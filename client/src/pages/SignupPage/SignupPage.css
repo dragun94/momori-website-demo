@@ -1,0 +1,59 @@
+/* ===== 약관 ===== */
+.terms {
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 6px 16px;
+}
+
+.terms__all {
+  border-bottom: 1px solid var(--color-border);
+  padding: 6px 0;
+}
+
+.terms__list {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+}
+
+.terms__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.terms__badge {
+  font-weight: 600;
+  color: var(--color-point-strong);
+}
+
+.terms__badge--optional {
+  color: var(--color-text-sub);
+}
+
+.terms__view {
+  font-size: 13px;
+}
+
+/* ===== 가입 완료 ===== */
+.welcome {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.welcome__emoji {
+  font-size: 44px;
+}
+
+.welcome__title {
+  margin: 12px 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.welcome__desc {
+  margin: 0 0 24px;
+  color: var(--color-text-sub);
+}

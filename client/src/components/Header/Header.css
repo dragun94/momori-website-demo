@@ -1,0 +1,141 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: var(--header-height);
+  background: rgba(251, 247, 241, 0.92); /* --color-bg 반투명 */
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 960px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.header__logo {
+  flex-shrink: 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-point-strong);
+  text-decoration: none;
+}
+
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-size: 14px;
+}
+
+.header__user {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+  margin-right: 4px;
+  color: var(--color-text-sub);
+  white-space: nowrap;
+}
+
+.header__who {
+  display: flex;
+  min-width: 0;
+}
+
+/* 좁은 화면: "OO님 / 반갑습니다" 두 줄로 */
+@media (max-width: 419px) {
+  .header__user {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0;
+    font-size: 13px;
+    line-height: 1.3;
+  }
+}
+
+/* 이름이 길면 말줄임 */
+.header__name {
+  overflow: hidden;
+  max-width: 6em;
+  text-overflow: ellipsis;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+/* 링크와 버튼을 같은 모양으로 (터치 영역 44px) */
+.header__link {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.header__link:hover:not(:disabled) {
+  color: var(--color-point-strong);
+}
+
+.header__link:disabled {
+  color: var(--color-disabled-text);
+  cursor: progress;
+}
+
+.header__link--point {
+  min-height: 36px;
+  padding: 0 14px;
+  background: var(--color-point-soft);
+  color: var(--color-point-strong);
+}
+
+/* 관리자에게만 보이는 버튼 */
+.header__link--admin {
+  min-height: 32px;
+  margin-right: 4px;
+  padding: 0 10px;
+  border: 1.5px solid var(--color-point-strong);
+  font-size: 13px;
+  color: var(--color-point-strong);
+}
+
+.header__link--admin:hover {
+  background: var(--color-point-soft);
+}
+
+/* 좁은 화면: 메뉴가 한 줄에 들어가도록 조금씩 줄임 */
+@media (max-width: 419px) {
+  .header__logo {
+    font-size: 18px;
+  }
+
+  .header__nav {
+    gap: 2px;
+  }
+
+  .header__link {
+    padding: 0 6px;
+    font-size: 13px;
+  }
+
+  .header__link--admin {
+    padding: 0 8px;
+    font-size: 12px;
+  }
+}

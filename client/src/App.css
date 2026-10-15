@@ -1,6 +1,7 @@
-/* ===== 공통 페이지 레이아웃 ===== */
+/* ===== 여러 페이지가 함께 쓰는 공통 레이아웃 =====
+   특정 페이지/컴포넌트 전용 스타일은 각 폴더의 .css에 둡니다. */
 .page {
-  min-height: 100vh;
+  min-height: calc(100vh - var(--header-height));
   display: flex;
   justify-content: center;
   padding: 24px 16px 48px;
@@ -26,46 +27,13 @@
   }
 }
 
-/* ===== 브랜드 헤더 ===== */
-.brand {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.brand__logo {
-  display: inline-block;
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--color-point-strong);
-  text-decoration: none;
-}
-
-.brand__logo::after {
-  content: '';
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-left: 3px;
-  border-radius: 50%;
-  background: var(--color-point);
-  vertical-align: top;
-  transform: translateY(6px);
-}
-
-.brand__welcome {
-  margin: 10px 0 0;
-  font-size: 15px;
-  color: var(--color-text-sub);
-}
-
 .page-title {
   margin: 0 0 20px;
   font-size: 20px;
   font-weight: 700;
 }
 
-/* ===== 섹션 / 폼 ===== */
+/* ===== 폼 ===== */
 .form {
   display: flex;
   flex-direction: column;
@@ -79,48 +47,23 @@
   border: 0;
 }
 
-/* ===== 약관 ===== */
-.terms {
-  background: var(--color-surface-soft);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 6px 16px;
-}
-
-.terms__all {
-  border-bottom: 1px solid var(--color-border);
-  padding: 6px 0;
-}
-
-.terms__list {
-  list-style: none;
+.form-error {
   margin: 0;
-  padding: 6px 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: #fdecea;
+  font-size: 14px;
+  color: var(--color-error);
 }
 
-.terms__item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.terms__badge {
-  font-weight: 600;
-  color: var(--color-point-strong);
-}
-
-.terms__badge--optional {
-  color: var(--color-text-sub);
-}
-
-.terms__view {
+/* 링크처럼 보이는 버튼 (약관 보기, 비밀번호 찾기 등) */
+.text-link {
   flex-shrink: 0;
   min-height: 44px;
   padding: 0 4px;
   border: 0;
   background: none;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--color-text-sub);
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -140,47 +83,4 @@
   font-weight: 600;
   color: var(--color-point-strong);
   text-decoration: none;
-}
-
-.form-error {
-  margin: 0;
-  padding: 12px 14px;
-  border-radius: var(--radius-sm);
-  background: #fdecea;
-  font-size: 14px;
-  color: var(--color-error);
-}
-
-/* ===== 메인 페이지 ===== */
-.home {
-  text-align: center;
-  padding-top: 15vh;
-}
-
-.home__actions {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 40px;
-}
-
-/* ===== 가입 완료 ===== */
-.welcome {
-  text-align: center;
-  padding: 8px 0;
-}
-
-.welcome__emoji {
-  font-size: 44px;
-}
-
-.welcome__title {
-  margin: 12px 0 8px;
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.welcome__desc {
-  margin: 0 0 24px;
-  color: var(--color-text-sub);
 }

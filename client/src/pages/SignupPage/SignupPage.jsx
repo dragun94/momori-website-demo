@@ -1,17 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Input from "../components/Input";
-import Button from "../components/Button";
-import Checkbox from "../components/Checkbox";
-import Modal from "../components/Modal";
-import { signup } from "../api/auth";
-import { TERMS } from "../constants/terms";
+import BrandHeader from "../../components/BrandHeader";
+import Input from "../../components/Input";
+import Button from "../../components/Button";
+import Checkbox from "../../components/Checkbox";
+import Modal from "../../components/Modal";
+import { signup } from "../../api/auth";
+import { TERMS } from "../../constants/terms";
 import {
   validateEmail,
   validateName,
   validatePassword,
   validatePasswordConfirm,
-} from "../utils/validation";
+} from "../../utils/validation";
+import "./SignupPage.css";
 
 const FIELDS = ["email", "password", "passwordConfirm", "name"];
 const INITIAL_FORM = { email: "", password: "", passwordConfirm: "", name: "" };
@@ -125,12 +127,7 @@ function SignupPage() {
   return (
     <main className="page">
       <div className="card">
-        <header className="brand">
-          <Link to="/" className="brand__logo">
-            모모리
-          </Link>
-          <p className="brand__welcome">우리 아기의 첫 순간을 함께해요</p>
-        </header>
+        <BrandHeader welcome="우리 아기의 첫 순간을 함께해요" />
 
         <h1 className="page-title">회원가입</h1>
 
@@ -203,7 +200,7 @@ function SignupPage() {
                   </Checkbox>
                   <button
                     type="button"
-                    className="terms__view"
+                    className="text-link terms__view"
                     onClick={() => setOpenTerm(term.key)}
                     aria-label={`${term.label} 내용 보기`}
                   >

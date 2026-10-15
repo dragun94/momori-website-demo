@@ -6,7 +6,7 @@ Node.js + Express 5 + MongoDB(Mongoose) API 서버
 
 ```bash
 npm install
-cp .env.example .env   # 값 수정
+cp .env.example .env   # 값 수정 (JWT_SECRET은 반드시 무작위 문자열로)
 npm run dev            # 개발 (nodemon 자동 재시작)
 npm start              # 운영
 ```
@@ -20,7 +20,7 @@ src/
 ├── config/            # 환경변수(env.js), DB 연결(db.js)
 ├── routes/            # 주소(URL) → 컨트롤러 연결만 담당 (로직 없음)
 │   ├── index.js       # /api 아래에 각 라우트 등록
-│   ├── auth.routes.js      # 회원가입 (로그인 예정)
+│   ├── auth.routes.js      # 회원가입, 로그인/로그아웃, 내 정보
 │   ├── user.routes.js
 │   ├── address.routes.js   # /users/:userId/addresses
 │   ├── category.routes.js
@@ -31,7 +31,7 @@ src/
 ├── controllers/       # 기능(요청 처리 로직): 라우트 파일과 1:1 대응
 ├── services/          # 여러 컨트롤러가 함께 쓰는 로직
 │   └── order.service.js    # 재고 차감/복구, 주문 상태 변경 규칙
-├── utils/             # httpError(에러 생성), request(pick, 페이지네이션)
+├── utils/             # httpError(에러 생성), request(pick, 페이지네이션), authToken(JWT·쿠키)
 ├── models/            # Mongoose 스키마
 │   ├── User.js        # 회원 (비밀번호 해시, 배송지 목록)
 │   ├── Category.js    # 카테고리
@@ -39,7 +39,7 @@ src/
 │   ├── Cart.js        # 장바구니 (회원당 1개)
 │   ├── Order.js       # 주문 (상품 스냅샷, 상태 이력)
 │   └── Payment.js     # 결제 (PG 연동용)
-└── middlewares/       # 404, 에러 핸들러
+└── middlewares/       # 404, 에러 핸들러, auth(requireAuth/requireAdmin), rateLimit(로그인 시도 제한)
 ```
 
 ## 모델
@@ -78,11 +78,26 @@ User ─┬─< Cart(1:1) ──> Product ──> Category
 ### 인증 `/api/auth`
 | Method | URL | 설명 |
 |---|---|---|
-| POST | /api/auth/signup | 회원가입 `{ email, password, name, phone?, termsAgreed, marketingAgreed? }` |
+| POST | /api/auth/signup | 회원가입 `{ email, password, name, phone?, termsAgreed, marketingAgreed? }` (자동 로그인 안 함) |
+| POST | /api/auth/login | 로그인 `{ email, password, rememberMe? }` → 쿠키 발급 + 회원 정보 |
+| GET | /api/auth/me | 현재 로그인한 회원 정보 (없거나 만료 시 401) |
+| POST | /api/auth/logout | 로그아웃 (쿠키 삭제) |
 
 - `termsAgreed: true`가 아니면 400 (필수 약관: 이용약관·개인정보·만 14세 이상). 동의 시각은 `termsAgreedAt`에 저장.
 - 마케팅 동의 시 `marketingAgreed`, `marketingAgreedAt` 저장. 이미 가입된 이메일은 409.
 - 비밀번호: 8자 이상, 영문+숫자 포함 (저장 시 bcrypt 해시).
+- 로그인 실패는 이메일 없음/비밀번호 틀림 구분 없이 401 "이메일 또는 비밀번호가 맞지 않아요".
+- 로그인 시도 제한: IP당 15분에 실패 10회 초과 시 429 (성공한 로그인은 횟수에서 제외).
+
+**인증 방식**: JWT를 httpOnly 쿠키(`momori_token`, sameSite=lax, 운영에서만 secure)에 저장.
+- 기본: 토큰 유효기간 `JWT_EXPIRES_IN`(1일), 쿠키는 브라우저를 닫으면 삭제되는 세션 쿠키
+- 로그인 상태 유지(`rememberMe: true`): 토큰·쿠키 모두 30일
+
+**보호 미들웨어** (`middlewares/auth.js`)
+```js
+router.get('/me', requireAuth, handler);           // 로그인 필요 → req.user 사용 가능 (실패 시 401)
+router.use(requireAuth, requireAdmin);              // 관리자 전용 (role이 admin이 아니면 403)
+```
 
 ### 회원 `/api/users`
 | Method | URL | 설명 |

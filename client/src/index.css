@@ -30,6 +30,7 @@
   --radius-lg: 24px;
   --shadow-soft: 0 6px 24px rgba(140, 110, 90, 0.08);
   --control-height: 52px;
+  --header-height: 56px;
 
   --font-base: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
     system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
